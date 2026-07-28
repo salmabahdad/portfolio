@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salma Bahdad — Data Science & IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;
+    --bg-soft:#f7f7f5;
+    --surface:#fbfbf9;
+    --line:#e5e3dd;
+    --ink:#181611;
+    --text:#3d3a34;
+    --text-dim:#78746a;
+    --text-faint:#aca795;
+    --accent:#8a6a3f;
+    --accent-deep:#4a4030;
+    --teal:#3f6e63;
+    --radius:3px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    line-height:1.65;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent); color:#fff;}
+
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:500; letter-spacing:-0.01em; color:var(--ink);}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--accent);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:18px;
+  }
+  .eyebrow::before{content:''; width:22px; height:1px; background:var(--accent);}
+
+  .wrap{max-width:1080px; margin:0 auto; padding:0 32px;}
+  section{padding:110px 0;}
+  @media (max-width:640px){ section{padding:72px 0;} .wrap{padding:0 20px;} }
+
+  /* NAV */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background:rgba(255,255,255,0.88); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; padding-top:20px; padding-bottom:20px;}
+  .logo{font-family:'Fraunces', serif; font-size:19px; letter-spacing:0.01em; color:var(--ink); font-weight:500;}
+  .logo span{color:var(--accent); font-style:italic;}
+  .navlinks{display:flex; gap:34px; list-style:none;}
+  .navlinks a{color:var(--text-dim); text-decoration:none; font-size:13px; font-family:'IBM Plex Mono',monospace; letter-spacing:0.02em; transition:color .2s;}
+  .navlinks a:hover{color:var(--accent);}
+  @media (max-width:640px){ .navlinks{display:none;} }
+
+  /* HERO */
+  #hero{
+    min-height:96vh; display:flex; align-items:center; position:relative;
+    padding-top:120px;
+  }
+  .grid-overlay{
+    position:absolute; inset:0; z-index:0; opacity:0.6;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(ellipse 700px 500px at 70% 30%, black, transparent 75%);
+  }
+  .hero-inner{position:relative; z-index:1; display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:center;}
+  @media (max-width:900px){ .hero-inner{grid-template-columns:1fr;} #graph-vis{display:none;} }
+
+  #hero h1{font-size:clamp(38px,5.6vw,60px); line-height:1.12; margin-bottom:22px; font-weight:500;}
+  #hero h1 em{font-style:italic; color:var(--accent); font-weight:500;}
+  .lede{font-size:17.5px; color:var(--text-dim); max-width:480px; margin-bottom:38px;}
+  .cta-row{display:flex; gap:14px; flex-wrap:wrap;}
+  .btn{
+    font-family:'IBM Plex Mono', monospace; font-size:12.5px; letter-spacing:0.03em;
+    padding:13px 22px; border-radius:var(--radius); text-decoration:none;
+    display:inline-flex; align-items:center; gap:8px; transition:all .2s;
+    border:1px solid var(--line);
+  }
+  .btn-primary{background:var(--ink); color:#fff; border-color:var(--ink);}
+  .btn-primary:hover{background:var(--accent-deep);}
+  .btn-ghost{color:var(--ink); }
+  .btn-ghost:hover{border-color:var(--accent); color:var(--accent);}
+
+  #graph-vis{width:100%; height:400px;}
+  .node{fill:#fff; stroke:var(--text-faint); stroke-width:1.4;}
+  .node-core{fill:var(--accent); stroke:var(--accent);}
+  .edge{stroke:var(--line); stroke-width:1.2; fill:none;}
+  .pulse{stroke:var(--teal); stroke-width:1.8; fill:none; stroke-dasharray:6 200; opacity:0.85; animation:travel 3.4s linear infinite;}
+  .pulse.p2{animation-delay:0.6s; stroke:var(--accent);}
+  .pulse.p3{animation-delay:1.3s;}
+  .pulse.p4{animation-delay:2s; stroke:var(--accent);}
+  @keyframes travel{ to{stroke-dashoffset:-400;} }
+  .node-label{font-family:'IBM Plex Mono',monospace; font-size:10px; fill:var(--text-dim);}
+
+  /* SECTION HEADERS */
+  .sec-head{display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:56px; flex-wrap:wrap; gap:16px; border-bottom:1px solid var(--line); padding-bottom:22px;}
+  .sec-head h2{font-size:clamp(27px,3.2vw,36px); font-weight:500;}
+  .sec-num{font-family:'IBM Plex Mono',monospace; color:var(--text-faint); font-size:13px;}
+
+  /* EXPERIENCE TIMELINE */
+  .timeline{position:relative; padding-left:32px; border-left:1px solid var(--line);}
+  .tl-item{position:relative; padding-bottom:50px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-dot{position:absolute; left:-37px; top:5px; width:10px; height:10px; border-radius:50%; background:#fff; border:2px solid var(--accent);}
+  .tl-date{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--teal); letter-spacing:0.03em; margin-bottom:7px; display:block;}
+  .tl-item h3{font-size:19px; margin-bottom:4px; font-weight:500;}
+  .tl-org{color:var(--text-dim); font-size:14px; margin-bottom:12px; display:block; font-style:italic;}
+  .tl-item ul{color:var(--text-dim); font-size:14.5px; max-width:660px; padding-left:18px;}
+  .tl-item li{margin-bottom:6px;}
+
+  /* PROJECTS */
+  .proj-flagship{
+    background:var(--surface); border:1px solid var(--line); border-radius:6px;
+    padding:44px; margin-bottom:28px; position:relative; overflow:hidden;
+  }
+  .proj-flagship::before{
+    content:''; position:absolute; top:0; left:0; width:3px; height:100%; background:var(--accent);
+  }
+  .proj-tag{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.08em;
+    color:var(--accent-deep); border:1px solid var(--line); background:#fff;
+    padding:4px 10px; border-radius:20px; margin-bottom:18px; text-transform:uppercase;
+  }
+  .proj-flagship h3{font-size:25px; margin-bottom:14px; font-weight:500;}
+  .proj-flagship p{color:var(--text-dim); max-width:680px; margin-bottom:28px; font-size:15px;}
+  .readouts{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-bottom:24px;}
+  .readout{background:#fff; padding:16px 18px;}
+  .readout .val{font-family:'IBM Plex Mono',monospace; font-size:19px; color:var(--teal); font-weight:600;}
+  .readout .lbl{font-size:11px; color:var(--text-faint); margin-top:4px;}
+  .stack-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .chip{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--text-dim); border:1px solid var(--line); padding:5px 10px; border-radius:4px; background:#fff;}
+
+  .proj-grid{display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+  @media (max-width:720px){ .proj-grid{grid-template-columns:1fr;} }
+  .proj-card{background:#fff; border:1px solid var(--line); border-radius:6px; padding:28px; transition:border-color .2s, transform .2s, box-shadow .2s;}
+  .proj-card:hover{border-color:var(--accent); transform:translateY(-3px); box-shadow:0 8px 24px rgba(24,22,17,0.06);}
+  .proj-card h3{font-size:17.5px; margin-bottom:10px; font-weight:500;}
+  .proj-card p{color:var(--text-dim); font-size:14px; margin-bottom:16px;}
+
+  /* SKILLS */
+  .skill-group{margin-bottom:26px;}
+  .skill-group h4{font-family:'IBM Plex Mono',monospace; font-size:11.5px; letter-spacing:0.08em; color:var(--text-faint); text-transform:uppercase; margin-bottom:14px;}
+  .skill-tags{display:flex; flex-wrap:wrap; gap:9px;}
+
+  /* EDUCATION + LANGUAGES */
+  .two-col{display:grid; grid-template-columns:1.3fr 0.7fr; gap:48px;}
+  @media (max-width:800px){ .two-col{grid-template-columns:1fr;} }
+  .edu-item{margin-bottom:26px;}
+  .edu-item:last-child{margin-bottom:0;}
+  .edu-date{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--teal); display:block; margin-bottom:5px;}
+  .edu-item h3{font-size:17px; font-weight:500; margin-bottom:3px;}
+  .edu-item span.school{color:var(--text-dim); font-size:14px; font-style:italic;}
+  .lang-item{display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--line); font-size:14.5px;}
+  .lang-item:last-child{border-bottom:none;}
+  .lang-item strong{font-weight:600; color:var(--ink);}
+  .lang-item span{color:var(--text-dim); font-family:'IBM Plex Mono',monospace; font-size:12.5px;}
+
+  /* CONTACT */
+  #contact{border-top:1px solid var(--line); background:var(--bg-soft);}
+  .contact-inner{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:32px;}
+  #contact h2{font-size:clamp(30px,4.4vw,46px); max-width:560px; font-weight:500;}
+  .contact-links{display:flex; flex-direction:column; gap:12px; align-items:flex-end;}
+  @media (max-width:640px){ .contact-links{align-items:flex-start;} }
+  .contact-links a{color:var(--text); text-decoration:none; font-family:'IBM Plex Mono',monospace; font-size:14px; transition:color .2s;}
+  .contact-links a:hover{color:var(--accent);}
+  footer{padding:26px 0; text-align:center; color:var(--text-faint); font-size:12px; font-family:'IBM Plex Mono',monospace; border-top:1px solid var(--line);}
+
+  .reveal{opacity:0; transform:translateY(16px); transition:opacity .6s ease, transform .6s ease;}
+  .reveal.in{opacity:1; transform:translateY(0);}
+  @media (prefers-reduced-motion: reduce){
+    .reveal{opacity:1; transform:none; transition:none;}
+    .pulse{animation:none;}
+    html{scroll-behavior:auto;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Salma <span>Bahdad</span></div>
+    <ul class="navlinks">
+      <li><a href="#experience">Expérience</a></li>
+      <li><a href="#projets">Projets</a></li>
+      <li><a href="#competences">Compétences</a></li>
+      <li><a href="#education">Formation</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section id="hero">
+  <div class="grid-overlay"></div>
+  <div class="wrap hero-inner">
+    <div>
+      <div class="eyebrow">Data Science · Machine Learning · IA</div>
+      <h1>Je transforme la donnée<br>en <em>décision.</em></h1>
+      <p class="lede">Bahdad Salma — Ingénieure Data Science & IA, diplômée de l'Université Mohammed V de Rabat. Spécialisée en machine learning, systèmes d'aide à la décision et agents IA / LLM appliqués à la finance et à l'analyse métier.</p>
+      <div class="cta-row">
+        <a href="#projets" class="btn btn-primary">Voir les projets →</a>
+        <a href="#contact" class="btn btn-ghost">Me contacter</a>
+      </div>
+    </div>
+    <svg id="graph-vis" viewBox="0 0 400 420" xmlns="http://www.w3.org/2000/svg">
+      <path class="edge" d="M 80 60 L 200 40" />
+      <path class="edge" d="M 80 60 L 60 180" />
+      <path class="edge" d="M 200 40 L 320 90" />
+      <path class="edge" d="M 60 180 L 170 210" />
+      <path class="edge" d="M 320 90 L 170 210" />
+      <path class="edge" d="M 170 210 L 220 330" />
+      <path class="edge" d="M 60 180 L 220 330" />
+      <path class="edge" d="M 320 90 L 340 260" />
+      <path class="edge" d="M 340 260 L 220 330" />
+
+      <path class="pulse p1" d="M 80 60 L 200 40" />
+      <path class="pulse p2" d="M 200 40 L 320 90 L 340 260" />
+      <path class="pulse p3" d="M 80 60 L 60 180 L 170 210" />
+      <path class="pulse p4" d="M 170 210 L 220 330" />
+
+      <circle class="node node-core" cx="80" cy="60" r="9"/>
+      <circle class="node" cx="200" cy="40" r="7"/>
+      <circle class="node" cx="320" cy="90" r="7"/>
+      <circle class="node" cx="60" cy="180" r="7"/>
+      <circle class="node node-core" cx="170" cy="210" r="9"/>
+      <circle class="node" cx="340" cy="260" r="7"/>
+      <circle class="node" cx="220" cy="330" r="7"/>
+
+      <text class="node-label" x="94" y="64">input</text>
+      <text class="node-label" x="214" y="36">route</text>
+      <text class="node-label" x="334" y="86">rag</text>
+      <text class="node-label" x="20" y="184">ml</text>
+      <text class="node-label" x="184" y="214">reason</text>
+      <text class="node-label" x="354" y="256">shap</text>
+      <text class="node-label" x="234" y="334">output</text>
+    </svg>
+  </div>
+</section>
+
+<section id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Expérience</h2>
+      <span class="sec-num">01 / parcours</span>
+    </div>
+    <div class="timeline reveal">
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <span class="tl-date">FÉVRIER 2026 — AOÛT 2026</span>
+        <h3>AI Engineer — Projet de Fin d'Études</h3>
+        <span class="tl-org">Orange Maroc, Direction Finance — Casablanca</span>
+        <ul>
+          <li>Architecturé un agent conversationnel LLM (graphe d'état LangGraph à 6 nœuds, routage conditionnel à 5 voies) combinant génération via LLM local (Ollama) et réponses déterministes, avec RAG (ChromaDB, embeddings multilingues) et garde-fou anti-hallucination validé par SHAP.</li>
+          <li>Conçu, entraîné et déployé 3 modèles ML pour la Direction Finance : conversion commerciale (XGBoost), prévision de revenu (HistGradientBoostingRegressor) et délais de facturation (classification ordinale), avec SHAP pour l'explicabilité en production.</li>
+          <li>Participé à la consolidation des données de facturation B2B (~60 datasets) sous Dataiku et PySpark ; conception d'un dashboard Dash pour le pilotage opérationnel.</li>
+        </ul>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <span class="tl-date">AVRIL 2025 — JUIN 2025</span>
+        <h3>AI Engineer / ML — Projet</h3>
+        <span class="tl-org">Redal — Rabat</span>
+        <ul>
+          <li>Conçu et déployé un système ML de maintenance prédictive (détection d'anomalies, estimation du RUL, clustering) avec Scikit-learn et XGBoost, conteneurisé avec Docker et exposé via une API FastAPI.</li>
+          <li>Mis en place des dashboards Dash pour le monitoring des équipements et des alertes.</li>
+        </ul>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <span class="tl-date">MARS 2024 — JUIN 2024</span>
+        <h3>Stagiaire Data Engineer / ERP et Data Manager</h3>
+        <span class="tl-org">SetupSys — Casablanca</span>
+        <ul>
+          <li>Conçu des pipelines ETL (Python, SQL) pour intégrer et fiabiliser les données de plusieurs modules Odoo (Achats, Inventaire, Facturation).</li>
+          <li>Développé des dashboards Dash pour le suivi des KPI opérationnels.</li>
+        </ul>
+      </div>
+      <div class="tl-item">
+        <span class="tl-dot"></span>
+        <span class="tl-date">JUILLET 2023 — AOÛT 2023</span>
+        <h3>Stagiaire Data Analytics et Développement d'Application</h3>
+        <span class="tl-org">Banque Populaire — Siège, Rabat</span>
+        <ul>
+          <li>Conçu et déployé une application de réservation de salles automatisée de bout en bout, réduisant les conflits de planification.</li>
+          <li>Automatisé le reporting via des scripts Python et créé un tableau de bord Power BI pour la visibilité managériale.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projets">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Projets</h2>
+      <span class="sec-num">02 / réalisations</span>
+    </div>
+
+    <div class="proj-flagship reveal">
+      <span class="proj-tag">Projet de fin d'études</span>
+      <h3>Predictive Revenue Control</h3>
+      <p>Système hybride d'aide à la décision pour la direction Finance/B2B d'Orange Maroc, combinant trois modèles de machine learning et une couche cognitive LLM/RAG orchestrée en graphe d'états, livré via un dashboard Dash.</p>
+      <div class="readouts">
+        <div class="readout"><div class="val">0.93</div><div class="lbl">AUC-ROC — modèle de conversion (XGBoost)</div></div>
+        <div class="readout"><div class="val">0.80</div><div class="lbl">R² log — régression quantile (HistGB)</div></div>
+        <div class="readout"><div class="val">6 nœuds</div><div class="lbl">Orchestration LangGraph</div></div>
+        <div class="readout"><div class="val">82.5%</div><div class="lbl">Couverture — appariement client/famille</div></div>
+      </div>
+      <div class="stack-row">
+        <span class="chip">XGBoost</span>
+        <span class="chip">HistGradientBoosting</span>
+        <span class="chip">LangGraph</span>
+        <span class="chip">RAG · ChromaDB</span>
+        <span class="chip">SHAP</span>
+        <span class="chip">Dash</span>
+        <span class="chip">Ollama (LLM local)</span>
+      </div>
+    </div>
+
+    <div class="proj-grid">
+      <div class="proj-card reveal">
+        <h3>F1 Pit Stop Strategy Simulator</h3>
+        <p>Simulateur de course F1 haute-fidélité dans lequel des agents de reinforcement learning optimisent le timing des arrêts au stand et la stratégie de pneus, sous contrainte temps réel.</p>
+        <div class="stack-row"><span class="chip">Reinforcement Learning</span><span class="chip">Python</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Fine-tuning de BERT — Analyse de sentiments</h3>
+        <p>Pipeline NLP complet (Hugging Face Transformers, PyTorch) adaptant un modèle de langage pré-entraîné à un cas d'usage métier.</p>
+        <div class="stack-row"><span class="chip">BERT</span><span class="chip">Hugging Face</span><span class="chip">PyTorch</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Smart Vision System</h3>
+        <p>Détection et suivi d'objets en temps réel avec YOLOv8 et OpenCV, applicable à des cas de surveillance intelligente en environnements dynamiques.</p>
+        <div class="stack-row"><span class="chip">YOLOv8</span><span class="chip">OpenCV</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Analyse financière bancaire & reporting KPI</h3>
+        <p>Analyse de transactions et flux financiers, détection d'anomalies et tableaux de bord Power BI pour la prise de décision exécutive.</p>
+        <div class="stack-row"><span class="chip">Power BI</span><span class="chip">SQL</span><span class="chip">Excel</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Segmentation clients & performance commerciale</h3>
+        <p>Segmentation de la clientèle avec Python, SQL et Scikit-learn, visualisation des profils et KPI dans Tableau pour soutenir les décisions commerciales.</p>
+        <div class="stack-row"><span class="chip">Scikit-learn</span><span class="chip">Tableau</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Pipeline de facturation B2B</h3>
+        <p>Consolidation Dataiku/PySpark d'une soixantaine de datasets, avec classification de la facturation (RUN_RATE / ANNUEL / SSM).</p>
+        <div class="stack-row"><span class="chip">Dataiku</span><span class="chip">PySpark</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Smart Airplane Boarding RL</h3>
+        <p>Environnement Gymnasium personnalisé simulant l'embarquement d'un avion, avec un agent MaskablePPO qui apprend à réduire le temps d'attente dans l'allée et à optimiser l'ordre d'embarquement.</p>
+        <div class="stack-row"><span class="chip">Gymnasium</span><span class="chip">Stable Baselines3</span><span class="chip">Reinforcement Learning</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Darija Translation Model</h3>
+        <p>Fine-tuning du modèle multilingue NLLB sur un corpus parallèle Darija, pour améliorer la traduction Darija → Arabe Standard Moderne et Darija → Anglais.</p>
+        <div class="stack-row"><span class="chip">NLLB</span><span class="chip">Hugging Face Transformers</span><span class="chip">NLP</span></div>
+      </div>
+      <div class="proj-card reveal">
+        <h3>Sarenay Website</h3>
+        <p>Site e-commerce moderne et responsive présentant une collection de bijoux, pensé pour une expérience d'achat élégante et fluide.</p>
+        <div class="stack-row"><span class="chip">E-commerce</span><span class="chip">Web Design</span><span class="chip">Responsive</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="competences">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <h2>Compétences</h2>
+      <span class="sec-num">03 / stack</span>
+    </div>
+    <div class="reveal">
+      <div class="skill-group">
+        <h4>LLMs & Agents IA</h4>
+        <div class="skill-tags">
+          <span class="chip">LangGraph</span><span class="chip">LangChain</span><span class="chip">RAG</span><span class="chip">ChromaDB</span><span class="chip">MCP</span><span class="chip">Prompt engineering</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h4>Machine Learning & Deep Learning</h4>
+        <div class="skill-tags">
+          <span class="chip">Scikit-learn</span><span class="chip">XGBoost</span><span class="chip">HistGradientBoosting</span><span class="chip">SHAP</span><span class="chip">TensorFlow</span><span class="chip">PyTorch</span><span class="chip">Keras</span><span class="chip">CNN</span><span class="chip">RNN/LSTM</span><span class="chip">Hugging Face</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h4>Computer Vision & NLP</h4>
+        <div class="skill-tags">
+          <span class="chip">YOLOv8</span><span class="chip">OpenCV</span><span class="chip">NLP</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h4>BI & Visualisation</h4>
+        <div class="skill-tags">
+          <span class="chip">Power BI</span><span class="chip">Tableau</span><span class="chip">Dash</span><span class="chip">Streamlit</span><span class="chip">Matplotlib</span><span class="chip">Seaborn</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h4>Data Engineering & Cloud</h4>
+        <div class="skill-tags">
+          <span class="chip">Python</span><span class="chip">SQL</span><span class="chip">R</span><span class="chip">DAX</span><span class="chip">Spark</span><span class="chip">Dataiku</span><span class="chip">KNIME</span><span class="chip">Hadoop</span><span class="chip">Hive</span><span class="chip">Airflow</span><span class="chip">PostgreSQL</span><span class="chip">MySQL</span><span class="chip">MongoDB</span><span class="chip">AWS</span><span class="chip">Azure</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <h4>MLOps & Développement</h4>
+        <div class="skill-tags">
+          <span class="chip">Docker</span><span class="chip">FastAPI</span><span class="chip">Git</span><span class="chip">CI/CD</span><span class="chip">Django</span><span class="chip">React</span><span class="chip">JavaScript</span><span class="chip">Agile</span><span class="chip">Jira</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="contact">
+  <div class="wrap">
+    <div class="contact-inner reveal">
+      <h2>Discutons de votre prochain projet data.</h2>
+      <div class="contact-links">
+        <a href="mailto:bahdadsalma94@gmail.com">bahdadsalma94@gmail.com</a>
+        <a href="tel:+212623320511">+212 6 23 32 05 11</a>
+        <a href="https://github.com/salmabahdad" target="_blank">github.com/salmabahdad</a>
+        <a href="#">https://www.linkedin.com/in/salma-bahdad-5bb892282/</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>Bahdad Salma — Data Science & Intelligence Artificielle · Casablanca, Maroc</footer>
+
+<script>
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {threshold:0.12});
+  reveals.forEach(el=>io.observe(el));
+</script>
+
+</body>
+</html>
